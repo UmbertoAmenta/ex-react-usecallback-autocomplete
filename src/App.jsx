@@ -6,6 +6,7 @@ import Suggestions from "./componentes/Suggestions";
 export default function App() {
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState([]);
+  const [currProd, setCurrProd] = useState({});
 
   function debounce(call, delay) {
     let timer;
@@ -23,7 +24,6 @@ export default function App() {
         setProducts([]);
         return;
       }
-
       const request = await fetch(
         `http://localhost:5000/products?search=${search}`
       );
@@ -33,6 +33,13 @@ export default function App() {
     []
   );
 
+  const fetchProduct = async (id) => {
+    const request = await fetch(`http://localhost:5000/products/${id}`);
+    const data = await request.json();
+    setSearch("");
+    setCurrProd(data);
+  };
+
   useEffect(() => {
     fetchProducts(search);
   }, [search]);
@@ -40,7 +47,22 @@ export default function App() {
   return (
     <>
       <SearchBar search={search} setSearch={setSearch} />
-      <Suggestions products={products} isEmpty={search == ""} />
+      <Suggestions
+        products={products}
+        isEmpty={search == ""}
+        productDetails={fetchProduct}
+        currProd={currProd}
+      />
+      {currProd.id && (
+        <div className="product-details">
+          <h2>{currProd.name}</h2>
+          <img src={currProd.image} alt={currProd.name} />
+          <p>{currProd.description}</p>
+          <p>
+            <strong>Prezzo:</strong> €{currProd.price}
+          </p>
+        </div>
+      )}
     </>
   );
 }
