@@ -20,7 +20,7 @@ export default function App() {
 
   const fetchProducts = useCallback(
     debounce(async (search) => {
-      if (search === "") {
+      if (search.trim() === "") {
         setProducts([]);
         return;
       }
